@@ -34,7 +34,7 @@
 # Step-02: c1-versions.tf - Terraform Backends
 ## Step-02-01 Add backend block as below
 ```
-  # Adding Backend as S3 for Remote State Storage
+- Adding Backend as S3 for Remote State Storage
   backend "s3" { }  
 ```
 
@@ -46,7 +46,7 @@ region = "us-east-1"
 dynamodb_table = "nholuongut-dev-tfstate" 
 ```
 
-#3 Step-02-03: Create file named stag.conf
+## Step-02-03: Create file named stag.conf
 ```
 bucket = "terraform-on-aws-for-ec2"
 key    = "nholuongut/stag/terraform.tfstate"
@@ -58,7 +58,7 @@ dynamodb_table = "nholuongut-stag-tfstate"
 **Go to Services -> S3 -> terraform-on-aws-for-ec2**
 - Create Folder ```nholuongut```
 - Create Folder ```nholuongut\dev```
-- Create Folder ```nholuongut```\stag```
+- Create Folder ```nholuongut\stag```
 
 ## Step-02-05: Create DynamoDB Tables for Both Environments for Terraform State Locking
 - Create Dynamo DB Table for Dev Environment
@@ -99,9 +99,9 @@ terraform apply -input=false -var-file=dev.tfvars -auto-approve
 
 ## Step-04-01: dev.tfvars
 ```
-# Environment
+- Environment
 environment = "dev"
-# VPC Variables
+- VPC Variables
 vpc_name = "myvpc"
 vpc_cidr_block = "10.0.0.0/16"
 vpc_availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
@@ -113,7 +113,7 @@ vpc_create_database_subnet_route_table = true
 vpc_enable_nat_gateway = true  
 vpc_single_nat_gateway = true
 
-# EC2 Instance Variables
+- EC2 Instance Variables
 instance_type = "t3.micro"
 instance_keypair = "terraform-key"
 private_instance_count = 2
@@ -121,9 +121,9 @@ private_instance_count = 2
 
 ## Step-04-01: stag.tfvars
 ```
-# Environment
+- Environment
 environment = "stag"
-# VPC Variables
+- VPC Variables
 vpc_name = "myvpc"
 vpc_cidr_block = "10.0.0.0/16"
 vpc_availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
@@ -135,7 +135,7 @@ vpc_create_database_subnet_route_table = true
 vpc_enable_nat_gateway = true  
 vpc_single_nat_gateway = true
 
-# EC2 Instance Variables
+- EC2 Instance Variables
 instance_type = "t3.micro"
 instance_keypair = "terraform-key"
 private_instance_count = 2
@@ -148,7 +148,7 @@ private_instance_count = 2
 ## Step-05: terraform.tfvars
 - terraform.tfvars which autoloads for all environment creations will have only generic variables.
 ```
-# Generic Variables
+- Generic Variables
 aws_region = "us-east-1"
 business_divsion = "hr"
 ````
@@ -157,7 +157,7 @@ business_divsion = "hr"
 ## Step-06-01: c9-nullresource-provisioners.tf
 - Remove Local Exec Provisioner which is not applicable in CodePipeline -> CodeBuild case.
 ```
-## Local Exec Provisioner:  local-exec provisioner (Creation-Time Provisioner - Triggered during Create Resource)
+- Local Exec Provisioner:  local-exec provisioner (Creation-Time Provisioner - Triggered during Create Resource)
  provisioner "local-exec" {
     command = "echo VPC created on `date` and VPC ID: ${module.vpc.vpc_id} >> creation-time-vpc-id.txt"
     working_dir = "local-exec-output-files/"
@@ -169,7 +169,7 @@ business_divsion = "hr"
 ## Step-06-02: c8-elasticip.tf
 - Remove Local Exec Provisioner which is not applicable in CodePipeline -> CodeBuild case.
 ```
-## Local Exec Provisioner:  local-exec provisioner (Destroy-Time Provisioner - Triggered during deletion of Resource)
+- Local Exec Provisioner:  local-exec provisioner (Destroy-Time Provisioner - Triggered during deletion of Resource)
   provisioner "local-exec" {
     command = "echo Destroy time prov `date` >> destroy-time-prov.txt"
     working_dir = "local-exec-output-files/"
@@ -181,32 +181,32 @@ business_divsion = "hr"
 # Step-07: To Support Multiple Environments
 ## Step-07-01: c5-03-securitygroup-bastionsg.tf
 ```
-# Before
+- Before
   name = "public-bastion-sg"  
-# After
+- After
   name = "${local.name}-public-bastion-sg"
 ```
 
 ## Step-07-02: c5-04-securitygroup-privatesg.tf
 ```
-# Before
+- Before
   name = "private-sg"
-# After
+- After
   name = "${local-name}-private-sg"  
 ```
 
 ## Step-07-03: c5-05-securitygroup-loadbalancersg.tf
 ```
-# Before
+- Before
   name = "loadbalancer-sg"
-# After
+- After
   name = "${local.name}-loadbalancer-sg"  
 ```
 
 # Step-07-04: Create Variable for DNS Name to support multiple environments
 ## Step-07-04-01: c12-route53-dnsregistration.tf
 ```
-# DNS Name Input Variable
+- DNS Name Input Variable
 variable "dns_name" {
   description = "DNS Name to support multiple environments"
   type = string   
@@ -215,7 +215,7 @@ variable "dns_name" {
 
 ## Step-07-04-02: c12-route53-dnsregistration.tf
 ```
-# DNS Registration 
+- DNS Registration 
 resource "aws_route53_record" "apps_dns" {
   zone_id = data.aws_route53_zone.mydomain.zone_id 
   name    = var.dns_name 
@@ -230,49 +230,49 @@ resource "aws_route53_record" "apps_dns" {
 
 ## Step-07-04-03: dev.tfvars
 ```
-# DNS Name
-dns_name = "devdemo1.devopsincloud.com"
+- DNS Name
+dns_name = "devdemo1.devop.com"
 ```
 
 ## Step-07-04-04: stag.tfvars
 ```
-# DNS Name
-dns_name = "stagedemo1.devopsincloud.com"
+- DNS Name
+dns_name = "stagedemo1.luongutnho.com"
 ```
 
 ## Step-07-05: c11-acm-certificatemanager.tf
 - In your case, the domain names will change as per this step.
 ```
-# Before
+- Before
   subject_alternative_names = [
-    "*.devopsincloud.com"
+    "*.luongutnho.com"
   ]
 
-# After
+- After
   subject_alternative_names = [
-    #"*.devopsincloud.com"
+    #"*.luongutnho.com"
     var.dns_name  
   ]
 ```
 
 ## Step-07-06: c13-02-autoscaling-launchtemplate-resource.tf
 ```
-# Before
+- Before
   name = "my-launch-template"
-# After
+- After
   name_prefix = "${local.name}-"
 ```
 
 ## Step-07-07: c13-02-autoscaling-launchtemplate-resource.tf
 ```
-# Before
+- Before
   tag_specifications {
     resource_type = "instance"
     tags = {
       Name = "myasg"
     }
   }  
-# After
+- After
   tag_specifications {
     resource_type = "instance"
     tags = {
@@ -284,18 +284,18 @@ dns_name = "stagedemo1.devopsincloud.com"
 
 ## Step-07-08: c13-03-autoscaling-resource.tf
 ```
-# Before
+- Before
   name_prefix = "myasg-"
-# After
+- After
   name_prefix = "${local.name}-"  
 ```
 
 ## Step-07-09: c13-06-autoscaling-ttsp.tf
 ```
-# Before
+- Before
   name = "avg-cpu-policy-greater-than-xx"
   name = "alb-target-requests-greater-than-yy"
-# After
+- After
   name = "${local.name}-avg-cpu-policy-greater-than-xx"
   name = "${local.name}-alb-target-requests-greater-than-yy"  
 ```
@@ -331,6 +331,7 @@ dns_name = "stagedemo1.devopsincloud.com"
 - AWS Access Key ID is safely stored in Parameter Store
 - AWS_SECRET_ACCESS_KEY: /CodeBuild/MY_AWS_SECRET_ACCESS_KEY
 - AWS Secret Access Key is safely stored in Parameter Store
+
 ```
 version: 0.2
 
@@ -421,7 +422,7 @@ phases:
 # Step-11: Create Github Repository and Check-In file
 - Step-11-01: Create New Github Repository
 - Go to github.com and login with your credentials
-- URL: https://github.com/nholuongut (my git repo url)
+- URL: https://github.com/nholuongut/terraform-iac-devops-with-aws-codepipeline (my git repo url)
 - Click on Repositories Tab
 - Click on New to create a new repository
 - Repository Name: terraform-nholuongut-with-aws-codepipeline
@@ -433,27 +434,27 @@ phases:
 
 # Step-11-02: Clone Remote Repo and Copy all related files
 ```
-# Change Directory
+- Change Directory
 cd demo-repos
 
-# Execute Git Clone
+- Execute Git Clone
 git clone https://github.com/nholuongut/terraform-iacdevops-with-aws-codepipeline.git
 
-# Copy all files from Section-22 Git-Repo-Files folder
+- Copy all files from Section-22 Git-Repo-Files folder
 1. Source Folder Path: 22-IaC-DevOps-using-AWS-CodePipeline/Git-Repo-Files
 2. Copy all files from Source Folder to Destination Folder
 3. Destination Folder Path: demo-repos/terraform-iacdevops-with-aws-codepipeline
 
-# Verify Git Status
+- Verify Git Status
 git status
 
-# Git Commit
+- Git Commit
 git commit -am "First Commit"
 
-# Push files to Remote Repository
+- Push files to Remote Repository
 git push
 
-# Verify same on Remote Repository
+- Verify same on Remote Repository
 https://github.com/nholuongut/terraform-iacdevops-with-aws-codepipeline.git
 ```
 
@@ -528,15 +529,15 @@ https://github.com/nholuongut/terraform-iacdevops-with-aws-codepipeline.git
 - Verify Build Stage logs by clicking on details in pipeline screen
 
 ```
-[Container] 2021/05/11 06:24:06 Waiting for agent ping
-[Container] 2021/05/11 06:24:09 Waiting for DOWNLOAD_SOURCE
-[Container] 2021/05/11 06:24:09 Phase is DOWNLOAD_SOURCE
-[Container] 2021/05/11 06:24:09 CODEBUILD_SRC_DIR=/codebuild/output/src851708532/src
-[Container] 2021/05/11 06:24:09 YAML location is /codebuild/output/src851708532/src/buildspec-dev.yml
-[Container] 2021/05/11 06:24:09 Processing environment variables
-[Container] 2021/05/11 06:24:09 Decrypting parameter store environment variables
-[Container] 2021/05/11 06:24:09 Phase complete: DOWNLOAD_SOURCE State: FAILED
-[Container] 2021/05/11 06:24:09 Phase context status code: Decrypted Variables Error Message: AccessDeniedException: User: arn:aws:sts::180789647333:assumed-role/codebuild-codebuild-tf-iacdevops-aws-cp1-service-role/AWSCodeBuild-97595edc-1db1-4070-97a0-71fa862f0993 is not authorized to perform: ssm:GetParameters on resource: arn:aws:ssm:us-east-1:180789647333:parameter/CodeBuild/MY_AWS_ACCESS_KEY_ID
+[Container] 2023/05/11 06:24:06 Waiting for agent ping
+[Container] 2023/05/11 06:24:09 Waiting for DOWNLOAD_SOURCE
+[Container] 2023/05/11 06:24:09 Phase is DOWNLOAD_SOURCE
+[Container] 2023/05/11 06:24:09 CODEBUILD_SRC_DIR=/codebuild/output/src851708532/src
+[Container] 2023/05/11 06:24:09 YAML location is /codebuild/output/src851708532/src/buildspec-dev.yml
+[Container] 2023/05/11 06:24:09 Processing environment variables
+[Container] 2023/05/11 06:24:09 Decrypting parameter store environment variables
+[Container] 2023/05/11 06:24:09 Phase complete: DOWNLOAD_SOURCE State: FAILED
+[Container] 2023/05/11 06:24:09 Phase context status code: Decrypted Variables Error Message: AccessDeniedException: User: arn:aws:sts::180789647333:assumed-role/codebuild-codebuild-tf-iacdevops-aws-cp1-service-role/AWSCodeBuild-97595edc-1db1-4070-97a0-71fa862f0993 is not authorized to perform: ssm:GetParameters on resource: arn:aws:ssm:us-east-1:180789647333:parameter/CodeBuild/MY_AWS_ACCESS_KEY_ID
 ```
 
 # Step-16: Fix ssm:GetParameters IAM Role issues
@@ -584,13 +585,11 @@ arn:aws:iam::180789647333:role/service-role/codebuild-codebuild-tf-iacdevops-aws
 - Access and Test
 
 ```
-# Access and Test
-**http://devdemo1.devopsincloud.com**
+**Access and Test**
+- URL: http://devdemo1.luongutnho.com
+- URL: http://devdemo1.luongutnho.com/app1/index.html
+- URL: http://devdemo1.luongutnho.com/app1/metadata.html
 
-**http://devdemo1.devopsincloud.com/app1/index.html**
-
-**http://devdemo1.devopsincloud.com/app1/metadata.html**
-```
 
 # Step-19: Add Approval Stage before deploying to staging environment
 - Go to Services -> AWS CodePipeline -> tf-iacdevops-aws-cp1 -> Edit
@@ -653,22 +652,21 @@ arn:aws:iam::180789647333:role/service-role/codebuild-codebuild-tf-iacdevops-aws
 - Verify Load Balancer
 - Verify Load Balancer Target Group - Health Checks
 - Access and Test
-```
-# Access and Test
-http://stagedemo1.devopsincloud.com
-http://stagedemo1.devopsincloud.com/app1/index.html
-http://stagedemo1.devopsincloud.com/app1/metadata.html
-```
 
-#Step-24: Make a change and test the entire pipeline
+**Access and Test**
+- URL: http://stagedemo1.luongutnho.com
+- URL: http://stagedemo1.luongutnho.com/app1/index.html
+- URL: http://stagedemo1.luongutnho.com/app1/metadata.html
+
+# Step-24: Make a change and test the entire pipeline
 ## Step-24-01: ```c13-03-autoscaling-resource.tf```
 - Increase minimum EC2 Instances from 2 to 3
 ```
-# Before
+- Before
   desired_capacity = 2
   max_size = 10
   min_size = 2
-# After
+- After
   desired_capacity = 4
   max_size = 10
   min_size = 4
@@ -676,14 +674,14 @@ http://stagedemo1.devopsincloud.com/app1/metadata.html
 
 ## Step-24-02: Commit Changes via Git Repo
 ```
-# Verify Changes
+- Verify Changes
 git status
 
-# Commit Changes to Local Repository
+- Commit Changes to Local Repository
 git add .
 git commit -am "ASG Min Size from 2 to 4"
 
-# Push changes to Remote Repository
+- Push changes to Remote Repository
 git push
 ```
 
@@ -702,10 +700,10 @@ git push
 # Step-25: Destroy Resources
 ## Step-25-01: Update ```buildspec-dev.yml```
 ```
-# Before
+- Before
     TF_COMMAND: "apply"
     #TF_COMMAND: "destroy"
-# After
+- After
     #TF_COMMAND: "apply"
     TF_COMMAND: "destroy"    
 ```
@@ -713,14 +711,14 @@ git push
 ## Step-25-03: Commit Changes via Git Repo
 
 ```
-# Verify Changes
+- Verify Changes
 git status
 
-# Commit Changes to Local Repository
+- Commit Changes to Local Repository
 git add .
 git commit -am "Destroy Resources"
 
-# Push changes to Remote Repository
+- Push changes to Remote Repository
 git push
 ```
 
@@ -734,11 +732,11 @@ git push
 ## Step-26-01: c13-03-autoscaling-resource.tf
 - Change them back to original state
 ```
-# Before
+- Before
   desired_capacity = 4
   max_size = 10
   min_size = 4
-# After
+- After
   desired_capacity = 2
   max_size = 10
   min_size = 2
@@ -747,24 +745,22 @@ git push
 ## Step-26-02: buildspec-dev.yml and buildspec-stag.yml
 - Change them back to original state
 ```
-# Before
+- Before
     #TF_COMMAND: "apply"
     TF_COMMAND: "destroy"   
-# After
+- After
     TF_COMMAND: "apply"
     #TF_COMMAND: "destroy"     
 ```
 
 ## Step-26-03: Commit Changes via Git Repo
 ```
-# Verify Changes
+- Verify Changes
 git status
-
-# Commit Changes to Local Repository
+- Commit Changes to Local Repository
 git add .
 git commit -am "Fixed all the changes back to demo state"
-
-# Push changes to Remote Repository
+- Push changes to Remote Repository
 git push
 ```
 
